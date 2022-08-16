@@ -7,10 +7,10 @@ from tensorflow.keras.optimizers import Adam
 import tensorflow as tf
 import pickle
 import plotly.graph_objects as go
-from example.strategies.tools.dataset import Dataset
+from tools.dataset import Dataset
 
 
-PATH = 'example/strategies/strategies/deep_learning/saved_model/'
+PATH = '/saved_model/'
 
 
 class AgentTrader:

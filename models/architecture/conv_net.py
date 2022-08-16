@@ -4,20 +4,11 @@ import tensorflow as tf
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
 from tensorflow.keras.optimizers import Adam
+from base_model import BaseModel
 import numpy as np
-import pandas as pd
 
 
-class ConvNetClassifier:
-    def __init__(self, input_shape, output_shape, learning_rate=0.001):
-        self.input_shape = input_shape
-        self.output_shape = output_shape
-        self.learning_rate = learning_rate
-        self.epochs = 10000
-        self.batch_size = 32
-        self.verbose = 1
-        self.build_model()
-
+class ConvNetClassifier(BaseModel):
     def build_model(self):
         self.model = Sequential()
         self.model.add(
@@ -38,31 +29,8 @@ class ConvNetClassifier:
         self.model.compile(optimizer=Adam(learning_rate=self.learning_rate),
                            loss='binary_crossentropy', metrics=['accuracy'])
 
-    def fit(self, x_train, y_train, x_test, y_test):
-        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
 
-        self.history = self.model.fit(
-            x_train, y_train, epochs=self.epochs, batch_size=self.batch_size, verbose=self.verbose, callbacks=callback, use_multiprocessing=True)
-        self.metrics = self.model.evaluate(
-            x_test,
-            y_test,
-            verbose=self.verbose
-        )
-
-    def predict(self, x_test):
-        return self.model.predict(x_test)
-
-
-class ConvNetRegressor:
-    def __init__(self, input_shape, output_shape, learning_rate=0.001):
-        self.input_shape = input_shape
-        self.output_shape = output_shape
-        self.learning_rate = learning_rate
-        self.epochs = 10000
-        self.batch_size = 32
-        self.verbose = 1
-        self.build_model()
-
+class ConvNetRegressor(BaseModel):
     def build_model(self):
         self.model = Sequential()
         self.model.add(
@@ -82,20 +50,6 @@ class ConvNetRegressor:
         self.model.add(Dense(units=self.output_shape, activation='linear'))
         self.model.compile(optimizer=Adam(learning_rate=self.learning_rate),
                            loss='mean_squared_error', metrics=['mse'])
-
-    def fit(self, x_train, y_train, x_test, y_test):
-        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
-
-        self.history = self.model.fit(
-            x_train, y_train, epochs=self.epochs, batch_size=self.batch_size, verbose=self.verbose, callbacks=callback, use_multiprocessing=True)
-        self.metrics = self.model.evaluate(
-            x_test,
-            y_test,
-            verbose=self.verbose
-        )
-
-    def predict(self, x_test):
-        return self.model.predict(x_test)
 
 
 if __name__ == "main":

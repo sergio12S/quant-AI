@@ -1,20 +1,12 @@
 import tensorflow as tf
 from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Dense, LSTM, GRU, Dropout, RepeatVector, TimeDistributed
+from tensorflow.keras.layers import Dense, LSTM, GRU, Dropout, RepeatVector, TimeDistributed, Flatten
 from tensorflow.keras.optimizers import Adam
+from models.architecture.base_model import BaseModel
 import numpy as np
 
 
-class RnnGruNetClassifier:
-    def __init__(self, input_shape, output_shape, learning_rate=0.001):
-        self.input_shape = input_shape
-        self.output_shape = output_shape
-        self.learning_rate = learning_rate
-        self.epochs = 100
-        self.batch_size = 32
-        self.verbose = 1
-        self.build_model()
-
+class RnnGruNetClassifier(BaseModel):
     def build_model(self):
         self.model = Sequential()
         self.model.add(
@@ -32,31 +24,8 @@ class RnnGruNetClassifier:
         self.model.compile(optimizer=Adam(learning_rate=self.learning_rate),
                            loss='binary_crossentropy', metrics=['accuracy'])
 
-    def fit(self, x_train, y_train, x_test, y_test):
-        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
 
-        self.history = self.model.fit(
-            x_train, y_train, epochs=self.epochs, batch_size=self.batch_size, verbose=self.verbose, callbacks=callback, use_multiprocessing=True)
-        self.metrics = self.model.evaluate(
-            x_test,
-            y_test,
-            verbose=self.verbose
-        )
-
-    def predict(self, x_test):
-        return self.model.predict(x_test)
-
-
-class RnnGruNetRegressor:
-    def __init__(self, input_shape, output_shape, learning_rate=0.001):
-        self.input_shape = input_shape
-        self.output_shape = output_shape
-        self.learning_rate = learning_rate
-        self.epochs = 100
-        self.batch_size = 32
-        self.verbose = 1
-        self.build_model()
-
+class RnnGruNetRegressor(BaseModel):
     def build_model(self):
         self.model = Sequential()
         self.model.add(
@@ -69,24 +38,10 @@ class RnnGruNetRegressor:
         self.model.add(RepeatVector(self.input_shape))
         self.model.add(GRU(units=self.input_shape, return_sequences=True))
         self.model.add(Dropout(0.2))
-        self.model.add(TimeDistributed(
-            Dense(units=self.output_shape, activation='linear')))
+        self.model.add(Flatten())
+        self.model.add(Dense(units=self.output_shape, activation='linear'))
         self.model.compile(optimizer=Adam(learning_rate=self.learning_rate),
-                           loss='mean_squared_error', metrics=['mse'])
-
-    def fit(self, x_train, y_train, x_test, y_test):
-        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
-
-        self.history = self.model.fit(
-            x_train, y_train, epochs=self.epochs, batch_size=self.batch_size, verbose=self.verbose, callbacks=callback, use_multiprocessing=True)
-        self.metrics = self.model.evaluate(
-            x_test,
-            y_test,
-            verbose=self.verbose
-        )
-
-    def predict(self, x_test):
-        return self.model.predict(x_test)
+                           loss='mae', metrics=['mae'])
 
 
 # Test the RnnGruNet class for trading with random data
