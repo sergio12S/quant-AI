@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
-
-
 import tensorflow as tf
+import numpy as np
 
 
 class BaseModel(ABC):
@@ -43,7 +42,7 @@ class BaseModel(ABC):
         """
         pass
 
-    def fit(self, x_train, y_train, x_test, y_test):
+    def fit_train_test(self, x_train: np.ndarray, y_train: np.ndarray, x_test: np.ndarray, y_test: np.ndarray):
         """
         Train the model for the architecture using
         """
@@ -60,8 +59,24 @@ class BaseModel(ABC):
         self.metrics = self.model.evaluate(
             x_test, y_test, verbose=self.verbose)
 
-    def predict(self, x_test):
+    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
+        """
+        Fit the model for the architecture using
+        """
+        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+        self.history = self.model.fit(
+            X, y,
+            epochs=self.epochs,
+            batch_size=self.batch_size,
+            verbose=self.verbose,
+            callbacks=callback,
+            use_multiprocessing=True
+        )
+        self.metrics = self.model.evaluate(
+            X, y, verbose=self.verbose)
+
+    def predict(self, x: np.ndarray):
         """
         Predict the model for the architecture using
         """
-        return self.model.predict(x_test)
+        return self.model.predict(x)

@@ -3,6 +3,7 @@ from operator import imod
 
 import numpy as np
 import tensorflow as tf
+from sklearn.preprocessing import MinMaxScaler
 
 
 class ProcessingData:
@@ -53,4 +54,29 @@ class ProcessingData:
 
     def normalize(self):
         return (self.data - self.data_mean) / self.data_std
-    
+
+
+class Transformer:
+    def __init__(self) -> None:
+        self.scaler = MinMaxScaler(feature_range=(0, 1))
+
+    def fit_transform(self, data: np.ndarray):
+        return self.scaler.fit_transform(data)
+
+    def min_max_scaler(self, data: np.ndarray):
+        return self.scaler.transform(data)
+
+    def inverse_min_max_scaler(self, data: np.ndarray):
+        return self.scaler.inverse_transform(data)
+
+    def split_data(self, data: np.ndarray, test_size: float):
+        return np.split(data, [int(test_size * data.shape[0])])
+
+    def transform_to_lstm_input(self, data: np.ndarray, window_size: int, step_size: int = 0):
+        data = self.fit_transform(data.reshape(-1, 1))
+        X = []
+        y = []
+        for i in range(window_size, data.shape[0] - step_size):
+            X.append(data[i-window_size:i])
+            y.append(data[i + step_size])
+        return np.array(X), np.array(y)
