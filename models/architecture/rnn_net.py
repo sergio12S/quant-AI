@@ -7,6 +7,9 @@ import numpy as np
 
 
 class RnnGruNetClassifier(BaseModel):
+    # def __init__(self):
+    #     super().__init__()
+
     def build_model(self):
         self.model = Sequential()
         self.model.add(
@@ -30,18 +33,18 @@ class RnnGruNetRegressor(BaseModel):
         self.model = Sequential()
         self.model.add(
             LSTM(
-                units=self.input_shape,
-                input_shape=(self.input_shape, 1)
+                units=128,
+                input_shape=self.input_shape
             )
         )
         self.model.add(Dropout(0.2))
-        self.model.add(RepeatVector(self.input_shape))
-        self.model.add(GRU(units=self.input_shape, return_sequences=True))
+        self.model.add(RepeatVector(12))
+        self.model.add(GRU(units=64, return_sequences=True))
         self.model.add(Dropout(0.2))
         self.model.add(Flatten())
         self.model.add(Dense(units=self.output_shape, activation='linear'))
         self.model.compile(optimizer=Adam(learning_rate=self.learning_rate),
-                           loss='mae', metrics=['mae'])
+                           loss='mean_squared_error', metrics=['mse'])
 
 
 # Test the RnnGruNet class for trading with random data

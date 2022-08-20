@@ -11,7 +11,8 @@ class BaseModel(ABC):
         learning_rate=0.001,
         epochs=100,
         batch_size=32,
-        verbose=1
+        verbose=1,
+        patient=20
     ):
         """
         Initialize the ForwardNet class
@@ -28,6 +29,7 @@ class BaseModel(ABC):
         self.epochs = epochs
         self.batch_size = batch_size
         self.verbose = verbose
+        self.patient = patient
 
         self.model = None
         self.history = None
@@ -46,7 +48,7 @@ class BaseModel(ABC):
         """
         Train the model for the architecture using
         """
-        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=self.patient)
         self.history = self.model.fit(
             x_train, y_train,
             epochs=self.epochs,
@@ -63,7 +65,7 @@ class BaseModel(ABC):
         """
         Fit the model for the architecture using
         """
-        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=self.patient)
         self.history = self.model.fit(
             X, y,
             epochs=self.epochs,

@@ -1,9 +1,10 @@
-from operator import imod
+from typing import List, Dict, Tuple, Union
 
 
 import numpy as np
 import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
+import pandas as pd
 
 
 class ProcessingData:
@@ -59,6 +60,7 @@ class ProcessingData:
 class Transformer:
     def __init__(self) -> None:
         self.scaler = MinMaxScaler(feature_range=(0, 1))
+        self.index = None
 
     def fit_transform(self, data: np.ndarray):
         return self.scaler.fit_transform(data)
@@ -72,8 +74,15 @@ class Transformer:
     def split_data(self, data: np.ndarray, test_size: float):
         return np.split(data, [int(test_size * data.shape[0])])
 
-    def transform_to_lstm_input(self, data: np.ndarray, window_size: int, step_size: int = 0):
-        data = self.fit_transform(data.reshape(-1, 1))
+    def transform_to_lstm_input(
+        self,
+        data: pd.DataFrame,
+        cols: List,
+        window_size: int,
+        step_size: int = 0
+    ):
+        self.index = data.index
+        data = self.fit_transform(data[cols].values)
         X = []
         y = []
         for i in range(window_size, data.shape[0] - step_size):
