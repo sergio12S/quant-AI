@@ -85,7 +85,9 @@ class Transformer:
         data = self.fit_transform(data[cols].values)
         X = []
         y = []
+        indexes = []
         for i in range(window_size, data.shape[0] - step_size):
             X.append(data[i-window_size:i])
             y.append(data[i + step_size])
-        return np.array(X), np.array(y)
+            indexes.append(self.index[i])
+        return np.array(X), np.array(y), np.array(indexes)

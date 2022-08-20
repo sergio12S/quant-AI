@@ -1,3 +1,4 @@
+from operator import index
 from models.architecture.rnn_net import RnnGruNetRegressor
 from models.processing.processing_data import Transformer
 from dataclasses import dataclass
@@ -13,38 +14,54 @@ class Store:
     dataset: pd.DataFrame
     X: np.ndarray
     y: np.ndarray
+    indexes: np.ndarray
     X_split: np.ndarray
     y_split: np.ndarray
+    indexes_split: np.ndarray
     predictions: Dict
+
+
+@dataclass
+class Parameters:
+    cols = ['open', 'high', 'low', 'close']
+    window_size = 12
+    split: float = 0.7
+    epochs: int = 1000
+    numbers_of_models: int = 12
 
 
 class EnsembleModel:
     def __init__(self, dataset: pd.DataFrame):
+        self.params = Parameters()
         self.dataset = dataset
         self.stores = []
 
-    def init_models(self, lag=12):
-        for i in range(lag):
+    def init_models(self):
+        for i in range(self.params.numbers_of_models):
             transformer = Transformer()
-            X, y = transformer.transform_to_lstm_input(
+            X, y, indexes = transformer.transform_to_lstm_input(
                 data=self.dataset,
-                cols=['open', 'high', 'low', 'close'],
-                window_size=12,
+                cols=self.params.cols,
+                window_size=self.params.window_size,
                 step_size=i
             )
-            X_split = transformer.split_data(X, 0.2)
-            y_split = transformer.split_data(y, 0.2)
+            X_split = transformer.split_data(X, self.params.split)
+            y_split = transformer.split_data(y, self.params.split)
+            indexes_split = transformer.split_data(indexes, self.params.split)
             name = f'LSTM_regressor_{i}'
             model = RnnGruNetRegressor(
                 input_shape=X.shape[1:],
                 output_shape=y.shape[1],
-                epochs=1000,
+                epochs=self.params.epochs,
                 name=name
             )
             model.build_model()
             self.stores.append(
-                Store(model, transformer, self.dataset, X,
-                      y, X_split, y_split, {name: None})
+                Store(
+                    model, transformer, self.dataset, X,
+                    y, indexes, X_split, y_split,
+                    indexes_split, {name: None}
+                )
             )
 
     def fit_train_test(self):
