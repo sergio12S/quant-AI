@@ -14,7 +14,8 @@ def test_model():
     X, y = transformer.transform_to_lstm_input(
         data=dataset,
         cols=['open', 'high', 'low', 'close'],
-        window_size=12
+        window_size=12,
+        step_size=0
     )
     X_split = transformer.split_data(X, 0.2)
     y_split = transformer.split_data(y, 0.2)

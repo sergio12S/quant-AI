@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from unicodedata import name
 import tensorflow as tf
 import numpy as np
 
@@ -12,7 +13,8 @@ class BaseModel(ABC):
         epochs=100,
         batch_size=32,
         verbose=1,
-        patient=20
+        patient=20,
+        name=''
     ):
         """
         Initialize the ForwardNet class
@@ -36,6 +38,7 @@ class BaseModel(ABC):
         self.metrics = None
         self.confusion_matrix = None
         self.classification_report = None
+        self.name = name
 
     @abstractmethod
     def build_model(self):
