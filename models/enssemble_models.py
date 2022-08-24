@@ -73,9 +73,9 @@ class EnsembleModel:
                 i.y_split[1]
             )
 
-    def predict(self):
+    def predict(self, train: bool = False):
         for i in self.stores:
-            predict = i.model.predict(i.X_split[1])
+            predict = i.model.predict(i.X_split[0] if train else i.X_split[1])
             i.predictions[i.model.name] = i.transformer.inverse_min_max_scaler(
                 predict)
 

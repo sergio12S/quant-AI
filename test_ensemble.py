@@ -1,5 +1,7 @@
+import imp
 from tools.dataset import Dataset
 from models.enssemble_models import EnsembleModel
+import pickle
 
 
 if __name__ == '__main__':
@@ -10,3 +12,6 @@ if __name__ == '__main__':
     ensemble.predict()
     predicted = ensemble.get_predicted()
     print(predicted)
+    # save ensemble pickle
+    with open('ensemble.pickle', 'wb') as f:
+        pickle.dump(ensemble, f)
