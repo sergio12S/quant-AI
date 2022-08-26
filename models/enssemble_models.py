@@ -23,7 +23,7 @@ class Store:
 
 @dataclass
 class Parameters:
-    cols = ['open', 'high', 'low', 'close']
+    cols = []
     window_size = 12
     split: float = 0.7
     epochs: int = 1000
@@ -33,6 +33,7 @@ class Parameters:
 class EnsembleModel:
     def __init__(self, dataset: pd.DataFrame):
         self.params = Parameters()
+        self.params.cols = dataset.columns
         self.dataset = dataset
         self.stores = []
 

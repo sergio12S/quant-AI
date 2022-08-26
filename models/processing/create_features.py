@@ -4,17 +4,11 @@ import pandas_ta as ta
 
 
 class createFeatures:
-    def __init__(self, data: pd.DataFrame) -> None:
-        self.data = data
+    def __init__(self) -> None:
+        pass
 
-    def _techical_indicators(self):
-        return ta.add_all_ta_features(self.data, open="open", high="high", low="low", close="close", volume="volume")
-
-    def create_features(self):
-        return self._techical_indicators()
-
-    def create_labels(self):
-        return self.data['close']
-
-    def create_data(self):
-        return self.create_features(), self.create_labels()
+    def create_features(self, data: pd.DataFrame) -> pd.DataFrame:
+        data.ta.strategy("Momentum")
+        cols = data.columns
+        cols_filtered = list(filter(lambda x:  x.startswith('Q') is False, cols))
+        return data[cols_filtered].dropna()
