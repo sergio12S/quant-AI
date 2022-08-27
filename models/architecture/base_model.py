@@ -11,9 +11,9 @@ class BaseModel(ABC):
         output_shape,
         learning_rate=0.001,
         epochs=100,
-        batch_size=32,
+        batch_size=64,
         verbose=1,
-        patient=20,
+        patient=50,
         name=''
     ):
         """

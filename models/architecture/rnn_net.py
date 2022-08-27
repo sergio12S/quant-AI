@@ -33,13 +33,13 @@ class RnnGruNetRegressor(BaseModel):
         self.model = Sequential()
         self.model.add(
             LSTM(
-                units=128,
+                units=256,
                 input_shape=self.input_shape
             )
         )
         self.model.add(Dropout(0.2))
         self.model.add(RepeatVector(12))
-        self.model.add(GRU(units=64, return_sequences=True))
+        self.model.add(GRU(units=128, return_sequences=True))
         self.model.add(Dropout(0.2))
         self.model.add(Flatten())
         self.model.add(Dense(units=self.output_shape, activation='linear'))

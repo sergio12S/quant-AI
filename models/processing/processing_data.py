@@ -59,17 +59,27 @@ class ProcessingData:
 
 class Transformer:
     def __init__(self) -> None:
-        self.scaler = MinMaxScaler(feature_range=(0, 1))
+        self.scaler_x = MinMaxScaler(feature_range=(0, 1))
+        self.scaler_y = MinMaxScaler(feature_range=(0, 1))
         self.index = None
 
-    def fit_transform(self, data: np.ndarray):
-        return self.scaler.fit_transform(data)
+    def fit_transform_x(self, data: np.ndarray):
+        return self.scaler_x.fit_transform(data)
 
-    def min_max_scaler(self, data: np.ndarray):
-        return self.scaler.transform(data)
+    def fit_transform_y(self, data: np.ndarray):
+        return self.scaler_y.fit_transform(data)
 
-    def inverse_min_max_scaler(self, data: np.ndarray):
-        return self.scaler.inverse_transform(data)
+    def min_max_scaler_x(self, data: np.ndarray):
+        return self.scaler_x.transform(data)
+
+    def min_max_scaler_y(self, data: np.ndarray):
+        return self.scaler_y.transform(data)
+
+    def inverse_min_max_scaler_x(self, data: np.ndarray):
+        return self.scaler_x.inverse_transform(data)
+
+    def inverse_min_max_scaler_y(self, data: np.ndarray):
+        return self.scaler_y.inverse_transform(data)
 
     def split_data(self, data: np.ndarray, test_size: float):
         return np.split(data, [int(test_size * data.shape[0])])
@@ -82,12 +92,16 @@ class Transformer:
         step_size: int = 0
     ):
         self.index = data.index
-        data = self.fit_transform(data[cols].values)
+        x_scaler = data[cols].values
+        y_scaler = data[['open', 'high', 'low', 'close']].values
+        x_scaler = self.fit_transform_x(x_scaler)
+        y_scaler = self.fit_transform_y(y_scaler)
         X = []
         y = []
         indexes = []
-        for i in range(window_size, data.shape[0] - step_size):
-            X.append(data[i-window_size:i])
-            y.append(data[i + step_size])
+        for i in range(window_size, x_scaler.shape[0] - step_size):
+            X.append(x_scaler[i-window_size:i])
+            y.append(y_scaler[i + step_size][:4])  # 4 is the number of features
             indexes.append(self.index[i])
+
         return np.array(X), np.array(y), np.array(indexes)

@@ -5,7 +5,7 @@ import pickle
 
 
 if __name__ == '__main__':
-    dataset = Dataset().get_data(days=30, ticker='BTCUSDT', ts='1h')
+    dataset = Dataset().get_data(days=20, ticker='BTCUSDT', ts='1h')
     features = createFeatures().create_features(dataset[['open', 'high', 'low', 'close']])
 
     ensemble = EnsembleModel(features)

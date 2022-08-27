@@ -1,4 +1,3 @@
-from operator import index
 from models.architecture.rnn_net import RnnGruNetRegressor
 from models.processing.processing_data import Transformer
 from dataclasses import dataclass
@@ -25,7 +24,7 @@ class Store:
 class Parameters:
     cols = []
     window_size = 12
-    split: float = 0.7
+    split: float = 0.9
     epochs: int = 1000
     numbers_of_models: int = 12
 
@@ -77,8 +76,7 @@ class EnsembleModel:
     def predict(self, train: bool = False):
         for i in self.stores:
             predict = i.model.predict(i.X_split[0] if train else i.X_split[1])
-            i.predictions[i.model.name] = i.transformer.inverse_min_max_scaler(
-                predict)
+            i.predictions[i.model.name] = i.transformer.inverse_min_max_scaler_y(predict)
 
     def get_predicted(self):
         return {i.model.name: i.predictions[i.model.name] for i in self.stores}
