@@ -89,7 +89,8 @@ class Transformer:
         data: pd.DataFrame,
         cols: List,
         window_size: int,
-        step_size: int = 0
+        step_size: int = 0,
+        ahead: int = 0,
     ):
         self.index = data.index
         x_scaler = data[cols].values
@@ -99,9 +100,12 @@ class Transformer:
         X = []
         y = []
         indexes = []
-        for i in range(window_size, x_scaler.shape[0] - step_size):
+        for i in range(window_size, x_scaler.shape[0] - step_size - ahead):
             X.append(x_scaler[i-window_size:i])
-            y.append(y_scaler[i + step_size][:4])  # 4 is the number of features
+            if ahead > 0:
+                y.append(y_scaler[i:i+step_size+ahead])
+            else:
+                y.append(y_scaler[i + step_size][:4])
             indexes.append(self.index[i])
 
         return np.array(X), np.array(y), np.array(indexes)

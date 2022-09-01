@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Dense, LSTM, GRU, Dropout, RepeatVector, TimeDistributed, Flatten
+from tensorflow.keras.layers import Dense, LSTM, GRU, Dropout, RepeatVector, TimeDistributed, Flatten, Bidirectional, Reshape
 from tensorflow.keras.optimizers import Adam
 from models.architecture.base_model import BaseModel
 import numpy as np
@@ -45,6 +45,21 @@ class RnnGruNetRegressor(BaseModel):
         self.model.add(Dense(units=self.output_shape, activation='linear'))
         self.model.compile(optimizer=Adam(learning_rate=self.learning_rate),
                            loss='mean_squared_error', metrics=['mse'])
+
+
+class RnnPredictCandles(BaseModel):
+    def build_model(self):
+        self.model = Sequential()
+        self.model.add(Bidirectional(LSTM(units=64, input_shape=self.input_shape)))
+        self.model.add(Dropout(0.2))
+        self.model.add(RepeatVector(6))
+        self.model.add(GRU(units=32, return_sequences=True))
+        self.model.add(Dropout(0.2))
+        self.model.add(Flatten())
+        self.model.add(Dense(units=self.output_shape[0]*self.output_shape[1], activation='linear'))
+        self.model.add(Reshape(self.output_shape))
+        self.model.compile(optimizer=Adam(learning_rate=self.learning_rate),
+                           loss='mean_squared_error', metrics=['accuracy'])
 
 
 # Test the RnnGruNet class for trading with random data
