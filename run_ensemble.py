@@ -14,6 +14,7 @@ if __name__ == '__main__':
     ensemble.predict()
     predicted = ensemble.get_predicted()
     print(predicted)
+    
     # save ensemble pickle
-    with open('ensemble.pickle', 'wb') as f:
+    with open('store/ensemble.pickle', 'wb') as f:
         pickle.dump(ensemble, f)
